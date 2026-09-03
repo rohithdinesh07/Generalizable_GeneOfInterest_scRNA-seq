@@ -1,0 +1,33 @@
+# Data files - too large for GitHub
+data/demo/*.h5ad
+data/demo/*.h5
+*.h5ad
+*.h5
+
+# Results - generated outputs
+results/figures/*
+results/tables/*
+results/enrichment/*
+
+# Keep results folder structure
+!results/figures/.gitkeep
+!results/tables/.gitkeep
+!results/enrichment/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.ipynb_checkpoints/
+*.egg-info/
+dist/
+build/
+.env
+venv/
+.venv/
+
+# MacOS
+.DS_Store
+
+# Jupyter
+.jupyter/
