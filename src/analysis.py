@@ -27,7 +27,7 @@ class GeneOfInterestAnalysis:
         """
         if color is None:
             color = ["leiden", "sample"]
-        sc.pl.umap(self.adata, color=color, ncols=len(color))
+        sc.pl.umap(self.adata, color=color, ncols=len(color), show=False)
         plt.savefig(f"results/figures/leiden_plots/{state_name}.png", dpi=300, bbox_inches='tight')
         plt.clf()
 
@@ -41,7 +41,7 @@ class GeneOfInterestAnalysis:
             state_name : str - filename without extension
         """
         sc.tl.rank_genes_groups(self.adata, groupby='leiden', method='wilcoxon')
-        sc.pl.rank_genes_groups(self.adata, n_genes=n_genes, sharey=False)
+        sc.pl.rank_genes_groups(self.adata, n_genes=n_genes, sharey=False, show=False)
         plt.savefig(f"results/figures/leiden_plots/{state_name}.png", dpi=300, bbox_inches='tight')
         plt.clf()
 
@@ -54,7 +54,7 @@ class GeneOfInterestAnalysis:
             var_names : list - genes to plot
             state_name : str - filename without extension
         """
-        sc.pl.dotplot(self.adata, var_names=var_names, groupby='leiden', standard_scale='var', layer='counts')
+        sc.pl.dotplot(self.adata, var_names=var_names, groupby="leiden", standard_scale="var", layer="counts", show=False)
         plt.savefig(f"results/figures/dotplots/{state_name}.png", dpi=300, bbox_inches='tight')
         plt.clf()
 
@@ -76,7 +76,7 @@ class GeneOfInterestAnalysis:
         for i in range(len(gene_list)):
             sc.tl.score_genes(self.adata, gene_list=gene_list[i], score_name=name_list[i])
 
-        sc.pl.umap(self.adata, color=name_list, ncols=2, color_map='magma', vmax=vmax, size=20)
+        sc.pl.umap(self.adata, color=name_list, ncols=2, color_map="magma", vmax=vmax, size=20, show=False)
         plt.savefig(f"results/figures/score_plots/{state_name}.png", dpi=300, bbox_inches='tight')
         plt.clf()
 
