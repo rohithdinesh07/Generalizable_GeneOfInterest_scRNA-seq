@@ -13,6 +13,10 @@ results/enrichment/*
 !results/figures/.gitkeep
 !results/tables/.gitkeep
 !results/enrichment/.gitkeep
+!results/figures/exploration_figs/.gitkeep
+!results/figures/leiden_plots/.gitkeep
+!results/figures/dotplots/.gitkeep
+!results/figures/score_plots/.gitkeep
 
 # Python
 __pycache__/
