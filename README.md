@@ -16,10 +16,10 @@ This analysis asks: where is CELSR2 expressed in the ER+ tumor microenvironment,
 
 After subsetting to epithelial/tumor clusters and re-clustering with Harmony batch correction, CELSR2 expression was highest in three populations:
 
-- **Cluster 8 (21.6% expressing)** -- markers: H2AFZ, STMN1, TUBA1B, HMGN2. Proliferating luminal tumor cells (cycling). The highest-expressing cluster, consistent with PCP signaling playing a role in mitotic spindle orientation and cell division.
-- **Cluster 12 (18.1%)** -- markers: MGP, PEG10, ZFP36L1, XBP1. Luminal progenitor-like cells. MGP is associated with epithelial differentiation and calcium signaling.
-- **Cluster 0 (13.9%)** -- markers: RPL3, KRT19, KRT18, GATA3. Luminal epithelial tumor cells. GATA3 is a canonical luminal A marker.
-- **Cluster 2 (11.2%)** -- markers: XBP1, TFF3, SCGB2A2, KRT19. Secretory luminal cells.
+- **Cluster 8 (21.6% expressing)**: markers: H2AFZ, STMN1, TUBA1B, HMGN2. Proliferating luminal tumor cells (cycling). The highest-expressing cluster, consistent with PCP signaling playing a role in mitotic spindle orientation and cell division.
+- **Cluster 12 (18.1%)**: markers: MGP, PEG10, ZFP36L1, XBP1. Luminal progenitor-like cells. MGP is associated with epithelial differentiation and calcium signaling.
+- **Cluster 0 (13.9%)**: markers: RPL3, KRT19, KRT18, GATA3. Luminal epithelial tumor cells. GATA3 is a canonical luminal A marker.
+- **Cluster 2 (11.2%)**: markers: XBP1, TFF3, SCGB2A2, KRT19. Secretory luminal cells.
 
 Non-epithelial populations (CAFs, macrophages, T cells, mast cells) had near-zero CELSR2 expression, confirming it's tumor-cell specific in this context.
 
@@ -35,11 +35,11 @@ Raw 10x MTX -> QC & filtering -> Normalization -> HVG selection
 -> Gene scoring -> Cluster subsetting -> DEG analysis -> GO enrichment
 ```
 
-1. **QC** (`src/qc.py`) -- MT/ribosomal filtering, upper quantile cutoff, optional scVI doublet removal
-2. **Preprocessing** (`src/preprocessing.py`) -- normalize to total counts, log1p, highly variable gene selection
-3. **Clustering** (`src/clustering.py`) -- PCA, Harmony by sample, neighbors, UMAP, Leiden
-4. **Analysis** (`src/analysis.py`) -- GeneOfInterestAnalysis class wrapping all plotting and subsetting
-5. **Enrichment** (`src/enrichment.py`) -- preranked GSEA via gseapy on per-cluster DEG CSVs
+1. **QC** (`src/qc.py`): MT/ribosomal filtering, upper quantile cutoff, optional scVI doublet removal
+2. **Preprocessing** (`src/preprocessing.py`): normalize to total counts, log1p, highly variable gene selection
+3. **Clustering** (`src/clustering.py`): PCA, Harmony by sample, neighbors, UMAP, Leiden
+4. **Analysis** (`src/analysis.py`): GeneOfInterestAnalysis class wrapping all plotting and subsetting
+5. **Enrichment** (`src/enrichment.py`): preranked GSEA via gseapy on per-cluster DEG CSVs
 
 ---
 
