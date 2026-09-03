@@ -54,7 +54,7 @@ class GeneOfInterestAnalysis:
             var_names : list - genes to plot
             state_name : str - filename without extension
         """
-        sc.pl.dotplot(self.adata, var_names=var_names, groupby='leiden', standard_scale='var')
+        sc.pl.dotplot(self.adata, var_names=var_names, groupby='leiden', standard_scale='var', layer='counts')
         plt.savefig(f"results/figures/dotplots/{state_name}.png", dpi=300, bbox_inches='tight')
         plt.clf()
 

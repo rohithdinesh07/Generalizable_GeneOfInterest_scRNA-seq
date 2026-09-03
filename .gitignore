@@ -19,6 +19,14 @@ results/enrichment/*
 !results/figures/score_plots/.gitkeep
 !results/figures/enrichment_plots/.gitkeep
 
+# Raw data
+data/raw/
+!data/raw/README.md
+*.tsv
+*.tsv.gz
+*.mtx
+*.mtx.gz
+
 # Python
 __pycache__/
 *.py[cod]
