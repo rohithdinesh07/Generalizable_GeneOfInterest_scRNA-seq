@@ -3,30 +3,29 @@ from scipy.sparse import csr_matrix
 
 def preprocess(adata, HVG=2000):
     """
-    Normalize, log-transform, select highly variable genes, and compress AnnData.
+    Normalize, log-transform, and optionally subset to highly variable genes.
+    Run this after filtering, before PCA and clustering.
 
-    Parameters
-    ----------
-    adata : AnnData
-    HVG : int or None - number of highly variable genes to keep (default 2000). Set to None to skip.
+    Parameters:
+        adata : AnnData
+        HVG : int or None - how many highly variable genes to keep (default 2000), pass None to skip
 
-    Returns
-    -------
-    adata : AnnData
+    Returns:
+        adata : AnnData
     """
-    # Save raw counts — required by tools like scVI and DESeq2 that expect raw integer counts
+    # stash raw counts before touching anything — needed later for DEG tools like DESeq2
     adata.layers["raw_counts"] = adata.X.copy()
 
-    # Normalize and log transform
+    # normalize so every cell has the same total counts, then log transform
     sc.pp.normalize_total(adata)
     sc.pp.log1p(adata)
 
-    # Select highly variable genes — reduces noise and speeds up PCA/clustering
+    # keep only the most variable genes — reduces noise and makes PCA/clustering faster
     if HVG is not None:
         sc.pp.highly_variable_genes(adata, n_top_genes=HVG)
         adata = adata[:, adata.var.highly_variable]
 
-    # Compress to sparse matrix for local storage efficiency
+    # convert to sparse format to save memory
     adata.X = csr_matrix(adata.X)
 
     return adata

@@ -17,6 +17,7 @@ results/enrichment/*
 !results/figures/leiden_plots/.gitkeep
 !results/figures/dotplots/.gitkeep
 !results/figures/score_plots/.gitkeep
+!results/figures/enrichment_plots/.gitkeep
 
 # Python
 __pycache__/
