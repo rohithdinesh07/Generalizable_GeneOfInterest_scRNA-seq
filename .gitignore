@@ -1,8 +1,10 @@
 # Data files - too large for GitHub
-data/demo/*.h5ad
-data/demo/*.h5
 *.h5ad
 *.h5
+
+# Cache folders (scanpy read_10x_mtx cache)
+cache/
+notebooks/cache/
 
 # Results - generated outputs
 results/figures/*

@@ -1,41 +1,103 @@
 # Generalizable Gene-of-Interest scRNA-seq Pipeline
 
-A modular, reusable single-cell RNA-seq analysis pipeline for investigating any gene of interest across cell populations. Demonstrated using **CELSR2** in ER+ breast cancer (GSE161529 — 117,079 cells across 24 patient-derived tumor samples).
+A modular single-cell RNA-seq analysis pipeline built to be dropped into any gene-of-interest study. The pipeline handles everything from raw 10x data through QC, batch correction, clustering, and GO enrichment — swap your gene and go.
 
-## Biological Context
-CELSR2 is a planar cell polarity (PCP) GPCR hypothesized to promote collective cancer cell dissemination in ER+ breast cancer. This pipeline investigates its expression, co-expression patterns, and pathway associations across epithelial tumor cell populations.
+Demonstrated here on **CELSR2** in ER+ primary breast cancer tumors, using the GSE161529 dataset (Qian et al. 2020) — 18 ER+ primary tumor samples, ~98,000 cells, 23,276 genes.
 
-## Pipeline Overview
-1. **QC** — MT/ribosomal filtering, doublet removal (scVI)
-2. **Preprocessing** — normalization, log transformation, compression
-3. **Clustering** — Harmony batch correction, UMAP, Leiden clustering
-4. **Analysis** — gene scoring, exploratory plots, cluster subsetting
-5. **Enrichment** — GO enrichment on cluster DEGs (gseapy)
+---
 
-## Usage
-Open `notebooks/01_analysis.ipynb` and set your gene of interest. All pipeline functions accept parameters directly — change thresholds, resolutions, and gene lists interactively.
+## Biological Background
 
-```python
-from src.qc import run_qc
-from src.analysis import GeneOfInterestAnalysis
+CELSR2 is a planar cell polarity (PCP) receptor in the Flamingo/Starry Night GPCR family. It's been implicated in coordinating collective cell migration, and there's growing interest in whether PCP pathway dysregulation contributes to cancer cell dissemination in ER+ breast cancer — a subtype where the metastatic mechanism isn't as well understood as in more aggressive subtypes.
 
-adata = run_qc(adata, mt_threshold=20, min_genes=100)
-analysis = GeneOfInterestAnalysis(adata, gene="CELSR2")
-analysis.exploratory_plots()
+This analysis asks: where is CELSR2 expressed in the ER+ tumor microenvironment, what cell populations drive that expression, and what biological processes are enriched in those clusters?
+
+### What We Found
+
+After subsetting to epithelial/tumor clusters and re-clustering with Harmony batch correction, CELSR2 expression was highest in three populations:
+
+- **Cluster 8 (21.6% expressing)** — markers: H2AFZ, STMN1, TUBA1B, HMGN2. Proliferating luminal tumor cells (cycling). The highest-expressing cluster, which is consistent with PCP signaling playing a role in mitotic spindle orientation and cell division.
+- **Cluster 12 (18.1%)** — markers: MGP, PEG10, ZFP36L1, XBP1. Luminal progenitor-like cells. MGP is associated with epithelial differentiation and calcium signaling.
+- **Cluster 0 (13.9%)** — markers: RPL3, KRT19, KRT18, GATA3. Luminal epithelial tumor cells. GATA3 is a canonical luminal A marker — this is the canonical ER+ epithelial population.
+- **Cluster 2 (11.2%)** — markers: XBP1, TFF3, SCGB2A2, KRT19. Secretory luminal cells.
+
+Non-epithelial populations (CAFs, macrophages, T cells, mast cells) had near-zero CELSR2 expression, confirming it's tumor-cell specific in this context.
+
+GO enrichment on the high-CELSR2 clusters flagged mitotic spindle organization, chromosome segregation, and DNA replication — all consistent with the proliferating cluster driving expression. There was also enrichment for UPR/ER stress pathways in the luminal progenitor cluster, which aligns with XBP1 expression and luminal progenitor biology.
+
+---
+
+## Pipeline
+
+```
+Raw 10x MTX → QC & filtering → Normalization → HVG selection
+→ PCA → Harmony batch correction → UMAP → Leiden clustering
+→ Gene scoring → Cluster subsetting → DEG analysis → GO enrichment
 ```
 
-## Data
-Demo data not included due to file size. Download GSE161529 from GEO and run `notebooks/00_data_loading.ipynb` to generate the processed h5ad file.
+1. **QC** (`src/qc.py`) — MT/ribosomal filtering, upper quantile cutoff, optional scVI doublet removal
+2. **Preprocessing** (`src/preprocessing.py`) — normalize to total counts, log1p, highly variable gene selection
+3. **Clustering** (`src/clustering.py`) — PCA, Harmony by sample, neighbors, UMAP, Leiden
+4. **Analysis** (`src/analysis.py`) — `GeneOfInterestAnalysis` class wrapping all plotting and subsetting
+5. **Enrichment** (`src/enrichment.py`) — preranked GSEA via gseapy on per-cluster DEG CSVs
+
+---
+
+## Reproducing This Analysis
+
+### From raw data (full run)
+
+1. Download GSE161529 from GEO: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE161529
+2. Place `GSE161529_RAW/` and `GSE161529_features.tsv` in `data/raw/`
+3. Run all cells in `notebooks/01_analysis.ipynb` from the top
+
+### From demo H5AD (skip straight to analysis)
+
+The demo file (`data/demo/demo_adata.h5ad`) is the full concatenated dataset that's already been QC'd, filtered, and clustered. Sections 1–4 of the notebook are written out but annotated to skip — load the H5AD in Section 5 and run from there.
+
+The demo file is not committed to this repo (1.9GB). To get it, either run the full pipeline yourself or reach out.
+
+---
+
+## Usage
+
+```python
+GENE_OF_INTEREST = 'YOUR_GENE'   # swap this in the config cell
+
+# pipeline
+adata = plot_qc_metrics(adata)
+adata = filter_cells(adata, mt_threshold=20, remove_doublets=True)
+adata = preprocess(adata, HVG=2000)
+adata = cluster(adata, batch_key='sample', res=0.5)
+
+# analysis
+analysis = GeneOfInterestAnalysis(adata, GENE_OF_INTEREST)
+analysis.exploratory_plots()
+analysis.score_genes(gene_list=[...], name_list=[...])
+sub = analysis.subset_clusters(['0', '2', '8'])
+sub.save_deg_results('deg_results_subset')
+```
+
+All functions are parameterized — adjust thresholds, resolutions, and gene lists directly in the notebook.
+
+---
 
 ## Requirements
+
 ```
 pip install -r requirements.txt
 ```
 
+Core dependencies: scanpy, anndata, harmonypy, gseapy, scvi-tools (optional, for doublet removal)
+
+---
+
 ## Project Structure
+
 ```
-src/          - modular pipeline functions and analysis class
-notebooks/    - data loading and interactive analysis
-results/      - figures, tables, enrichment outputs (gitignored)
-data/demo/    - processed h5ad file (gitignored, generate locally)
+src/              modular pipeline modules and analysis class
+notebooks/        full analysis notebook (01_analysis.ipynb)
+results/          figures, tables, enrichment outputs (gitignored)
+data/demo/        processed h5ad demo file (gitignored)
+data/raw/         raw 10x MTX files (gitignored, see data/raw/README.md)
 ```
